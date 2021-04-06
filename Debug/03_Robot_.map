@@ -2925,8 +2925,9 @@ LOAD d:/programy/st/stm32cubeide_1.5.0/stm32cubeide/plugins/com.st.stm32cube.ide
                 0x00000000080003ac      0x11e Core/Src/STM32_Robot.o
                 0x00000000080003ac                robotReadSensors
  .text.robotStartProcedure
-                0x00000000080004ca       0xc6 Core/Src/STM32_Robot.o
+                0x00000000080004ca       0xc4 Core/Src/STM32_Robot.o
                 0x00000000080004ca                robotStartProcedure
+ *fill*         0x000000000800058e        0x2 
  .text.robotSwitchBuzzer
                 0x0000000008000590       0x30 Core/Src/STM32_Robot.o
                 0x0000000008000590                robotSwitchBuzzer
@@ -3676,23 +3677,23 @@ OUTPUT(03_Robot_.elf elf32-littlearm)
  .debug_macro   0x000000000001857d      0x1b7 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.o
  .debug_macro   0x0000000000018734      0x1b8 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.o
 
-.debug_line     0x0000000000000000     0xab83
- .debug_line    0x0000000000000000      0xb14 Core/Src/STM32_Robot.o
- .debug_line    0x0000000000000b14      0xa45 Core/Src/main.o
- .debug_line    0x0000000000001559      0x799 Core/Src/stm32f1xx_hal_msp.o
- .debug_line    0x0000000000001cf2      0x786 Core/Src/stm32f1xx_it.o
- .debug_line    0x0000000000002478      0x4f4 Core/Src/sysmem.o
- .debug_line    0x000000000000296c      0x6f4 Core/Src/system_stm32f1xx.o
- .debug_line    0x0000000000003060       0x84 Core/Startup/startup_stm32f103rbtx.o
- .debug_line    0x00000000000030e4      0x8a7 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o
- .debug_line    0x000000000000398b      0xbf8 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.o
- .debug_line    0x0000000000004583      0x97e Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.o
- .debug_line    0x0000000000004f01      0x8a3 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.o
- .debug_line    0x00000000000057a4      0x967 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.o
- .debug_line    0x000000000000610b      0x785 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.o
- .debug_line    0x0000000000006890     0x2000 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.o
- .debug_line    0x0000000000008890     0x130e Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.o
- .debug_line    0x0000000000009b9e      0xfe5 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.o
+.debug_line     0x0000000000000000     0xab8a
+ .debug_line    0x0000000000000000      0xb1b Core/Src/STM32_Robot.o
+ .debug_line    0x0000000000000b1b      0xa45 Core/Src/main.o
+ .debug_line    0x0000000000001560      0x799 Core/Src/stm32f1xx_hal_msp.o
+ .debug_line    0x0000000000001cf9      0x786 Core/Src/stm32f1xx_it.o
+ .debug_line    0x000000000000247f      0x4f4 Core/Src/sysmem.o
+ .debug_line    0x0000000000002973      0x6f4 Core/Src/system_stm32f1xx.o
+ .debug_line    0x0000000000003067       0x84 Core/Startup/startup_stm32f103rbtx.o
+ .debug_line    0x00000000000030eb      0x8a7 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.o
+ .debug_line    0x0000000000003992      0xbf8 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.o
+ .debug_line    0x000000000000458a      0x97e Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.o
+ .debug_line    0x0000000000004f08      0x8a3 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.o
+ .debug_line    0x00000000000057ab      0x967 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.o
+ .debug_line    0x0000000000006112      0x785 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.o
+ .debug_line    0x0000000000006897     0x2000 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.o
+ .debug_line    0x0000000000008897     0x130e Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.o
+ .debug_line    0x0000000000009ba5      0xfe5 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.o
 
 .debug_str      0x0000000000000000    0x8fae8
  .debug_str     0x0000000000000000    0x8c0a2 Core/Src/STM32_Robot.o

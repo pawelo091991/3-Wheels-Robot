@@ -37,13 +37,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
  16 .debug_macro  000188ec  00000000  00000000  00030778  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_line   0000ab83  00000000  00000000  00049064  2**0
+ 17 .debug_line   0000ab8a  00000000  00000000  00049064  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_str    0008fae8  00000000  00000000  00053be7  2**0
+ 18 .debug_str    0008fae8  00000000  00000000  00053bee  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .comment      0000007b  00000000  00000000  000e36cf  2**0
+ 19 .comment      0000007b  00000000  00000000  000e36d6  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000391c  00000000  00000000  000e374c  2**2
+ 20 .debug_frame  0000391c  00000000  00000000  000e3754  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -593,7 +593,7 @@ void robotStartProcedure(Robot* rob)
  80004d0:	6078      	str	r0, [r7, #4]
 	// loop until whole procedure is finished
 	while(rob->StartProcedureFinished == 0){
- 80004d2:	e054      	b.n	800057e <robotStartProcedure+0xb4>
+ 80004d2:	e053      	b.n	800057c <robotStartProcedure+0xb2>
 
 		// read data from sensors
 		robotReadSensors(rob);
@@ -601,124 +601,125 @@ void robotStartProcedure(Robot* rob)
  80004d6:	f7ff ff69 	bl	80003ac <robotReadSensors>
 
 		// loop until both sensors are switched on
-		while(rob->snr[0].snrVal == 1 || rob->snr[1].snrVal == 1){
- 80004da:	e002      	b.n	80004e2 <robotStartProcedure+0x18>
+		do{
 			robotReadSensors(rob);
- 80004dc:	6878      	ldr	r0, [r7, #4]
- 80004de:	f7ff ff65 	bl	80003ac <robotReadSensors>
-		while(rob->snr[0].snrVal == 1 || rob->snr[1].snrVal == 1){
- 80004e2:	687b      	ldr	r3, [r7, #4]
- 80004e4:	6d5b      	ldr	r3, [r3, #84]	; 0x54
- 80004e6:	2b01      	cmp	r3, #1
- 80004e8:	d0f8      	beq.n	80004dc <robotStartProcedure+0x12>
- 80004ea:	687b      	ldr	r3, [r7, #4]
- 80004ec:	6fdb      	ldr	r3, [r3, #124]	; 0x7c
- 80004ee:	2b01      	cmp	r3, #1
- 80004f0:	d0f4      	beq.n	80004dc <robotStartProcedure+0x12>
+ 80004da:	6878      	ldr	r0, [r7, #4]
+ 80004dc:	f7ff ff66 	bl	80003ac <robotReadSensors>
 		}
+		while(rob->snr[0].snrVal == 1 || rob->snr[1].snrVal == 1);
+ 80004e0:	687b      	ldr	r3, [r7, #4]
+ 80004e2:	6d5b      	ldr	r3, [r3, #84]	; 0x54
+ 80004e4:	2b01      	cmp	r3, #1
+ 80004e6:	d0f8      	beq.n	80004da <robotStartProcedure+0x10>
+ 80004e8:	687b      	ldr	r3, [r7, #4]
+ 80004ea:	6fdb      	ldr	r3, [r3, #124]	; 0x7c
+ 80004ec:	2b01      	cmp	r3, #1
+ 80004ee:	d0f4      	beq.n	80004da <robotStartProcedure+0x10>
+
 
 		// switch on LED to inform that start procedure is on
 		robotSwitchLED(rob, 1);
- 80004f2:	2101      	movs	r1, #1
- 80004f4:	6878      	ldr	r0, [r7, #4]
- 80004f6:	f000 f863 	bl	80005c0 <robotSwitchLED>
+ 80004f0:	2101      	movs	r1, #1
+ 80004f2:	6878      	ldr	r0, [r7, #4]
+ 80004f4:	f000 f864 	bl	80005c0 <robotSwitchLED>
 
 		// counter initialization
 		rob->StartProcedureCountNum = 0;
- 80004fa:	687b      	ldr	r3, [r7, #4]
- 80004fc:	2200      	movs	r2, #0
- 80004fe:	f8c3 20e4 	str.w	r2, [r3, #228]	; 0xe4
+ 80004f8:	687b      	ldr	r3, [r7, #4]
+ 80004fa:	2200      	movs	r2, #0
+ 80004fc:	f8c3 20e4 	str.w	r2, [r3, #228]	; 0xe4
 
 		// counter is set for around 4 seconds
-		while(rob->StartProcedureCountNum < 20000){
- 8000502:	e011      	b.n	8000528 <robotStartProcedure+0x5e>
+		while(rob->StartProcedureCountNum < START_CNT_NUM){
+ 8000500:	e011      	b.n	8000526 <robotStartProcedure+0x5c>
 			robotReadSensors(rob);
- 8000504:	6878      	ldr	r0, [r7, #4]
- 8000506:	f7ff ff51 	bl	80003ac <robotReadSensors>
+ 8000502:	6878      	ldr	r0, [r7, #4]
+ 8000504:	f7ff ff52 	bl	80003ac <robotReadSensors>
 
 			// if one of sensor is not switched on, stop the counting
 			if(rob->snr[0].snrVal == 1 || rob->snr[1].snrVal == 1){
- 800050a:	687b      	ldr	r3, [r7, #4]
- 800050c:	6d5b      	ldr	r3, [r3, #84]	; 0x54
- 800050e:	2b01      	cmp	r3, #1
- 8000510:	d011      	beq.n	8000536 <robotStartProcedure+0x6c>
- 8000512:	687b      	ldr	r3, [r7, #4]
- 8000514:	6fdb      	ldr	r3, [r3, #124]	; 0x7c
- 8000516:	2b01      	cmp	r3, #1
- 8000518:	d00d      	beq.n	8000536 <robotStartProcedure+0x6c>
+ 8000508:	687b      	ldr	r3, [r7, #4]
+ 800050a:	6d5b      	ldr	r3, [r3, #84]	; 0x54
+ 800050c:	2b01      	cmp	r3, #1
+ 800050e:	d011      	beq.n	8000534 <robotStartProcedure+0x6a>
+ 8000510:	687b      	ldr	r3, [r7, #4]
+ 8000512:	6fdb      	ldr	r3, [r3, #124]	; 0x7c
+ 8000514:	2b01      	cmp	r3, #1
+ 8000516:	d00d      	beq.n	8000534 <robotStartProcedure+0x6a>
 				break;
 			}
 			rob->StartProcedureCountNum++;
- 800051a:	687b      	ldr	r3, [r7, #4]
- 800051c:	f8d3 30e4 	ldr.w	r3, [r3, #228]	; 0xe4
- 8000520:	1c5a      	adds	r2, r3, #1
- 8000522:	687b      	ldr	r3, [r7, #4]
- 8000524:	f8c3 20e4 	str.w	r2, [r3, #228]	; 0xe4
-		while(rob->StartProcedureCountNum < 20000){
- 8000528:	687b      	ldr	r3, [r7, #4]
- 800052a:	f8d3 30e4 	ldr.w	r3, [r3, #228]	; 0xe4
- 800052e:	f644 621f 	movw	r2, #19999	; 0x4e1f
- 8000532:	4293      	cmp	r3, r2
- 8000534:	d9e6      	bls.n	8000504 <robotStartProcedure+0x3a>
+ 8000518:	687b      	ldr	r3, [r7, #4]
+ 800051a:	f8d3 30e4 	ldr.w	r3, [r3, #228]	; 0xe4
+ 800051e:	1c5a      	adds	r2, r3, #1
+ 8000520:	687b      	ldr	r3, [r7, #4]
+ 8000522:	f8c3 20e4 	str.w	r2, [r3, #228]	; 0xe4
+		while(rob->StartProcedureCountNum < START_CNT_NUM){
+ 8000526:	687b      	ldr	r3, [r7, #4]
+ 8000528:	f8d3 30e4 	ldr.w	r3, [r3, #228]	; 0xe4
+ 800052c:	f644 621f 	movw	r2, #19999	; 0x4e1f
+ 8000530:	4293      	cmp	r3, r2
+ 8000532:	d9e6      	bls.n	8000502 <robotStartProcedure+0x38>
 		}
 
 		// check if counter finished properly
-		if(rob->StartProcedureCountNum == 20000){
- 8000536:	687b      	ldr	r3, [r7, #4]
- 8000538:	f8d3 30e4 	ldr.w	r3, [r3, #228]	; 0xe4
- 800053c:	f644 6220 	movw	r2, #20000	; 0x4e20
- 8000540:	4293      	cmp	r3, r2
- 8000542:	d114      	bne.n	800056e <robotStartProcedure+0xa4>
+		if(rob->StartProcedureCountNum == START_CNT_NUM){
+ 8000534:	687b      	ldr	r3, [r7, #4]
+ 8000536:	f8d3 30e4 	ldr.w	r3, [r3, #228]	; 0xe4
+ 800053a:	f644 6220 	movw	r2, #20000	; 0x4e20
+ 800053e:	4293      	cmp	r3, r2
+ 8000540:	d114      	bne.n	800056c <robotStartProcedure+0xa2>
 
 			// mark that start procedure finished
 			rob->StartProcedureFinished = 1;
- 8000544:	687b      	ldr	r3, [r7, #4]
- 8000546:	2201      	movs	r2, #1
- 8000548:	f883 20e0 	strb.w	r2, [r3, #224]	; 0xe0
+ 8000542:	687b      	ldr	r3, [r7, #4]
+ 8000544:	2201      	movs	r2, #1
+ 8000546:	f883 20e0 	strb.w	r2, [r3, #224]	; 0xe0
 
 			// switch on buzzer for 0.5 second to announce that start procedure finished
 			robotSwitchBuzzer(rob, 1);
- 800054c:	2101      	movs	r1, #1
- 800054e:	6878      	ldr	r0, [r7, #4]
- 8000550:	f000 f81e 	bl	8000590 <robotSwitchBuzzer>
+ 800054a:	2101      	movs	r1, #1
+ 800054c:	6878      	ldr	r0, [r7, #4]
+ 800054e:	f000 f81f 	bl	8000590 <robotSwitchBuzzer>
 			HAL_Delay(500);
- 8000554:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
- 8000558:	f000 fd80 	bl	800105c <HAL_Delay>
+ 8000552:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
+ 8000556:	f000 fd81 	bl	800105c <HAL_Delay>
 			robotSwitchLED(rob, 0);
- 800055c:	2100      	movs	r1, #0
- 800055e:	6878      	ldr	r0, [r7, #4]
- 8000560:	f000 f82e 	bl	80005c0 <robotSwitchLED>
+ 800055a:	2100      	movs	r1, #0
+ 800055c:	6878      	ldr	r0, [r7, #4]
+ 800055e:	f000 f82f 	bl	80005c0 <robotSwitchLED>
 
 			// switch off LED
 			robotSwitchBuzzer(rob, 0);
- 8000564:	2100      	movs	r1, #0
- 8000566:	6878      	ldr	r0, [r7, #4]
- 8000568:	f000 f812 	bl	8000590 <robotSwitchBuzzer>
- 800056c:	e007      	b.n	800057e <robotStartProcedure+0xb4>
+ 8000562:	2100      	movs	r1, #0
+ 8000564:	6878      	ldr	r0, [r7, #4]
+ 8000566:	f000 f813 	bl	8000590 <robotSwitchBuzzer>
+ 800056a:	e007      	b.n	800057c <robotStartProcedure+0xb2>
 		}
 
 		//if counter does not finished properly, just switch off LED
 		else{
 			rob->StartProcedureCountNum = 0;
- 800056e:	687b      	ldr	r3, [r7, #4]
- 8000570:	2200      	movs	r2, #0
- 8000572:	f8c3 20e4 	str.w	r2, [r3, #228]	; 0xe4
+ 800056c:	687b      	ldr	r3, [r7, #4]
+ 800056e:	2200      	movs	r2, #0
+ 8000570:	f8c3 20e4 	str.w	r2, [r3, #228]	; 0xe4
 			robotSwitchLED(rob,0);
- 8000576:	2100      	movs	r1, #0
- 8000578:	6878      	ldr	r0, [r7, #4]
- 800057a:	f000 f821 	bl	80005c0 <robotSwitchLED>
+ 8000574:	2100      	movs	r1, #0
+ 8000576:	6878      	ldr	r0, [r7, #4]
+ 8000578:	f000 f822 	bl	80005c0 <robotSwitchLED>
 	while(rob->StartProcedureFinished == 0){
- 800057e:	687b      	ldr	r3, [r7, #4]
- 8000580:	f893 30e0 	ldrb.w	r3, [r3, #224]	; 0xe0
- 8000584:	2b00      	cmp	r3, #0
- 8000586:	d0a5      	beq.n	80004d4 <robotStartProcedure+0xa>
+ 800057c:	687b      	ldr	r3, [r7, #4]
+ 800057e:	f893 30e0 	ldrb.w	r3, [r3, #224]	; 0xe0
+ 8000582:	2b00      	cmp	r3, #0
+ 8000584:	d0a6      	beq.n	80004d4 <robotStartProcedure+0xa>
 		}
 	}
 }
- 8000588:	bf00      	nop
- 800058a:	3708      	adds	r7, #8
- 800058c:	46bd      	mov	sp, r7
- 800058e:	bd80      	pop	{r7, pc}
+ 8000586:	bf00      	nop
+ 8000588:	3708      	adds	r7, #8
+ 800058a:	46bd      	mov	sp, r7
+ 800058c:	bd80      	pop	{r7, pc}
+	...
 
 08000590 <robotSwitchBuzzer>:
 	  robotSetEnginePwm(rob, 40-diff, 40);

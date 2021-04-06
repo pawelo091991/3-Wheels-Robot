@@ -5,8 +5,8 @@ STM32_Robot.c:114:6:robotManualSteering	24	static
 STM32_Robot.c:137:6:robotReadSensors	32	static
 STM32_Robot.c:152:6:robotMove	16	static
 STM32_Robot.c:158:6:robotStartProcedure	16	static
-STM32_Robot.c:211:6:robotWallBouncer	16	static
-STM32_Robot.c:216:6:robotLightFollower	24	static
-STM32_Robot.c:242:6:robotLineFollowerV1	24	static
-STM32_Robot.c:260:6:robotSwitchBuzzer	16	static
-STM32_Robot.c:266:6:robotSwitchLED	16	static
+STM32_Robot.c:213:6:robotWallBouncer	16	static
+STM32_Robot.c:218:6:robotLightFollower	24	static
+STM32_Robot.c:244:6:robotLineFollowerV1	24	static
+STM32_Robot.c:262:6:robotSwitchBuzzer	16	static
+STM32_Robot.c:268:6:robotSwitchLED	16	static

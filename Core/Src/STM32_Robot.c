@@ -164,9 +164,11 @@ void robotStartProcedure(Robot* rob)
 		robotReadSensors(rob);
 
 		// loop until both sensors are switched on
-		while(rob->snr[0].snrVal == 1 || rob->snr[1].snrVal == 1){
+		do{
 			robotReadSensors(rob);
 		}
+		while(rob->snr[0].snrVal == 1 || rob->snr[1].snrVal == 1);
+
 
 		// switch on LED to inform that start procedure is on
 		robotSwitchLED(rob, 1);
