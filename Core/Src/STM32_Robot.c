@@ -155,9 +155,57 @@ void robotMove(Robot *rob)
 	robotSetEnginePwm(rob, -40, -40);
 }
 
-void RobotStartProcedure(Robot* rob)
+void robotStartProcedure(Robot* rob)
 {
+	// loop until whole procedure is finished
+	while(rob->StartProcedureFinished == 0){
 
+		// read data from sensors
+		robotReadSensors(rob);
+
+		// loop until both sensors are switched on
+		while(rob->snr[0].snrVal == 1 || rob->snr[1].snrVal == 1){
+			robotReadSensors(rob);
+		}
+
+		// switch on LED to inform that start procedure is on
+		robotSwitchLED(rob, 1);
+
+		// counter initialization
+		rob->StartProcedureCountNum = 0;
+
+		// counter is set for around 4 seconds
+		while(rob->StartProcedureCountNum < 20000){
+			robotReadSensors(rob);
+
+			// if one of sensor is not switched on, stop the counting
+			if(rob->snr[0].snrVal == 1 || rob->snr[1].snrVal == 1){
+				break;
+			}
+			rob->StartProcedureCountNum++;
+		}
+
+		// check if counter finished properly
+		if(rob->StartProcedureCountNum == 20000){
+
+			// mark that start procedure finished
+			rob->StartProcedureFinished = 1;
+
+			// switch on buzzer for 0.5 second to announce that start procedure finished
+			robotSwitchBuzzer(rob, 1);
+			HAL_Delay(500);
+			robotSwitchLED(rob, 0);
+
+			// switch off LED
+			robotSwitchBuzzer(rob, 0);
+		}
+
+		//if counter does not finished properly, just switch off LED
+		else{
+			rob->StartProcedureCountNum = 0;
+			robotSwitchLED(rob,0);
+		}
+	}
 }
 
 void robotWallBouncer(Robot* rob)
@@ -169,14 +217,14 @@ void robotLightFollower(Robot* rob)
 {
 	  robotReadSensors(rob);
 	  robotTelemetry(rob);
-	  if(rob->StartProcedureFlag == 0){
+	  if(rob->StartProcedureFinished == 0){
 		  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 		  HAL_Delay(1000);
 		  if(rob->snr[2].snrVal < 700 || rob->snr[3].snrVal < 700){
 			  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
 			  HAL_Delay(1000);
 			  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
-			  rob->StartProcedureFlag = 1;
+			  rob->StartProcedureFinished = 1;
 		  }
 	  }
 	  else{
@@ -209,3 +257,14 @@ void robotLineFollowerV1(Robot* rob)
 	}
 }
 
+void robotSwitchBuzzer(Robot* rob, uint8_t state)
+{
+	if(state == 0 || state == 1)
+		HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, state);
+}
+
+void robotSwitchLED(Robot* rob, uint8_t state)
+{
+	if(state == 0 || state == 1)
+		HAL_GPIO_WritePin(LED_PORT, LED_PIN, state);
+}

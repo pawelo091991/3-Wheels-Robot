@@ -106,6 +106,7 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   	  robotDefaultValuesInit(&rob, &htim3, &htim2, &huart2, &huart1, &huart2, &hadc1);
+  	  robotStartProcedure(&rob);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -115,14 +116,6 @@ int main(void)
 	  robotReadSensors(&rob);
 	  robotTelemetry(&rob);
 	  //HAL_Delay(2000);
-	  if(rob.snr[2].snrVal > 3600 && rob.snr[3].snrVal > 3600)
-		  robotSetEnginePwm(&rob, MXSPD, MXSPD);
-	  else if(rob.snr[2].snrVal < 3600 && rob.snr[3].snrVal > 3600)
-		  robotSetEnginePwm(&rob, 5, MXSPD);
-	  else if(rob.snr[2].snrVal > 3600 && rob.snr[3].snrVal < 3600)
-		  robotSetEnginePwm(&rob, MXSPD, 5);
-	  else
-		  robotSetEnginePwm(&rob, 0, 0);
 
     /* USER CODE END WHILE */
   }
