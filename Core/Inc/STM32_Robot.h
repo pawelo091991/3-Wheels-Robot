@@ -119,6 +119,24 @@ void robotTelemetry(Robot* rob);
 void robotManualSteering(Robot* rob);
 void robotReadSensors(Robot* rob);
 void robotMove(Robot* rob);
+
+/*
+ * void robotStartProcedure(Robot* rob)
+ *
+ * Summary of the robotStartProcedure function:
+ * 	This function engage start procedure in robot to ensure that robot will start when user want it to
+ *
+ * Parameters: 	rob: a pointer to object with LCD and I2C configuration data
+
+ *
+ * Return Value : None
+ *
+ * Description:
+ * 	This function run infinite while loop until user will switch on both contact switches for defined time
+ * 	When both switches are on, LED is switched on to show that procedure is counting to defined period time
+ * 	If user will switched off one of switch, procedure start from the beginning
+ * 	When start procedure is completed, it buzzes for 0.5 second and function exits
+ */
 void robotStartProcedure(Robot* rob);
 void robotWallBouncer(Robot* rob);
 void robotLightFollower(Robot* rob);

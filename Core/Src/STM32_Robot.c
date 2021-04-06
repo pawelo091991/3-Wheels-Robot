@@ -175,7 +175,7 @@ void robotStartProcedure(Robot* rob)
 		rob->StartProcedureCountNum = 0;
 
 		// counter is set for around 4 seconds
-		while(rob->StartProcedureCountNum < 20000){
+		while(rob->StartProcedureCountNum < START_CNT_NUM){
 			robotReadSensors(rob);
 
 			// if one of sensor is not switched on, stop the counting
@@ -186,7 +186,7 @@ void robotStartProcedure(Robot* rob)
 		}
 
 		// check if counter finished properly
-		if(rob->StartProcedureCountNum == 20000){
+		if(rob->StartProcedureCountNum == START_CNT_NUM){
 
 			// mark that start procedure finished
 			rob->StartProcedureFinished = 1;
