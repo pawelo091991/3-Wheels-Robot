@@ -95,19 +95,38 @@ void robotSetEnginePwm(Robot* rob, int8_t pwmValLeft, int8_t pwmValRight)
 
 void robotTelemetry(Robot *rob)
 {
-	char data[200];
-	//sprintf(data, "Left Enigne PWM Duty Cycle: %i%%\r\nRight Enigne PWM Duty Cycle: %i%%\r\n\r\n",
-			//rob->engLeft.pwmVal, rob->engRight.pwmVal);
-	//int32_t diff = rob->snr[2].snrVal - rob->snr[3].snrVa
-	sprintf(data, "Right Sensor: %lu\r\nLeft Sensor: %lu\r\nDifference = %li\r\n\r\n", rob->snr[2].snrVal, rob->snr[3].snrVal, (int32_t)(rob->snr[2].snrVal-rob->snr[3].snrVal));
+	// array with data to be send
+	char data[400];
 
+	// JSON serialisation structure for data from robot
+	char json[] = "{\"blthState\":\"%i\",\"StartProcedureFinished\":\"%i\",\"StartProcedureCountNum\":\"%i\",\""
+			"engLeft\":{\"dirPin\":\"%i\",\"pwmVal\":\"%i\"},\""
+			"engRight\":{\"dirPin\":\"%i\",\"pwmVal\":\"%i\"},\""
+			"snr[0]\":{\"snrName\":\"%s\",\"snrType\":\"%i\",\"snrVal\":\"%i\"},\""
+			"snr[1]\":{\"snrName\":\"%s\",\"snrType\":\"%i\",\"snrVal\":\"%i\"},\""
+			"snr[2]\":{\"snrName\":\"%s\",\"snrType\":\"%i\",\"snrVal\":\"%i\"},\""
+			"snr[3]\":{\"snrName\":\"%s\",\"snrType\":\"%i\",\"snrVal\":\"%i\"}}";
+
+	// JSON structure connection with robot variable into data array
+	sprintf(data, json, rob->blthState, rob->StartProcedureFinished, rob->StartProcedureCountNum,
+			rob->engLeft.dirPin, rob->engLeft.pwmVal,
+			rob->engRight.dirPin, rob->engRight.pwmVal,
+			rob->snr[0].snrName, rob->snr[0].snrType, rob->snr[0].snrVal,
+			rob->snr[1].snrName, rob->snr[1].snrType, rob->snr[1].snrVal,
+			rob->snr[2].snrName, rob->snr[2].snrType, rob->snr[2].snrVal,
+			rob->snr[3].snrName, rob->snr[3].snrType, rob->snr[3].snrVal);
+
+
+	// Check if UART through bluetooth is selected, if no then switch off bluetooth module
 	if(rob->uartSelected == rob->uartUSB)
 		HAL_GPIO_WritePin(rob->blthPinPort, rob->blthPin, GPIO_PIN_RESET);
 
 	else if(rob->uartSelected == rob->uartBlth)
 		HAL_GPIO_WritePin(rob->blthPinPort, rob->blthPin, GPIO_PIN_SET);
 
+	// Transmit the JSON data via UART
 	HAL_UART_Transmit(rob->uartSelected, (uint8_t*)data, strlen(data), 1000);
+
 
 }
 
@@ -195,7 +214,7 @@ void robotStartProcedure(Robot* rob)
 
 			// switch on buzzer for 0.5 second to announce that start procedure finished
 			robotSwitchBuzzer(rob, 1);
-			HAL_Delay(500);
+			HAL_Delay(1000);
 			robotSwitchLED(rob, 0);
 
 			// switch off LED
@@ -212,7 +231,49 @@ void robotStartProcedure(Robot* rob)
 
 void robotWallBouncer(Robot* rob)
 {
+	// create seed
+	srand(time(0));
+	while(1){
+		// read data from sensors
+		robotReadSensors(rob);
 
+		// go straight if nothing is in front
+		robotSetEnginePwm(rob, 40, 40);
+
+		// check if robot touch the wall from left side
+		if(rob->snr[0].snrVal == 0){
+			HAL_Delay(100);
+
+			// go backward
+			robotSetEnginePwm(rob, -40,-40);
+			HAL_Delay(500);
+
+			// turn right for random period of time
+			robotSetEnginePwm(rob, 40, -40);
+			HAL_Delay(rand()%1000 + 200);
+
+			// quick stop for better robot stability
+			robotSetEnginePwm(rob, 0, 0);
+			HAL_Delay(200);
+		}
+
+		// check if robot touch the wall from right side
+		else if(rob->snr[1].snrVal == 0){
+			HAL_Delay(100);
+
+			// go backward
+			robotSetEnginePwm(rob, -40,-40);
+			HAL_Delay(500);
+
+			// turn left for random period of time
+			robotSetEnginePwm(rob, -40, 40);
+			HAL_Delay(rand()%1000 + 200);
+
+			// quick stop for better robot stability
+			robotSetEnginePwm(rob, 0, 0);
+			HAL_Delay(200);
+		}
+	}
 }
 
 void robotLightFollower(Robot* rob)

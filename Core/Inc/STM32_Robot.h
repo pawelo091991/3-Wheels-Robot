@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define LED_PIN 		GPIO_PIN_5		//PA5
 #define LED_PORT		GPIOA
@@ -115,6 +116,21 @@ void robotDefaultValuesInit(Robot* rob, TIM_HandleTypeDef* timEngLeft, TIM_Handl
  * 	This function assignes peripherials(ADC, timers and UART) to Robot sturcture pointed by rob
  */
 void robotSetEnginePwm(Robot* rob, int8_t pwmValLeft, int8_t pwmValRight);
+
+
+/*
+ * void robotTelemetry(Robot* rob)
+ *
+ * Summary of the robotTelemetry function:
+ * 	This function serializes all robot parameters into JSON and send it via UART
+ *
+ * Parameters: 	rob: a pointer to object with LCD and I2C configuration data
+ *
+ * Return Value : None
+ *
+ * Description:
+ * 	This function serializes engines, sensors, and program statuses into JSON and send it via UART
+ */
 void robotTelemetry(Robot* rob);
 void robotManualSteering(Robot* rob);
 void robotReadSensors(Robot* rob);

@@ -1,0 +1,33 @@
+{
+  "blthState": "%i",
+  "StartProcedureFinished": "%i",
+  "StartProcedureCountNum": "%i",
+  "engLeft": {
+    "dirPin": "%i",
+    "pwmVal": "%i"
+  },
+  "engRight": {
+    "dirPin": "%i",
+    "pwmVal": "%i"
+  },
+  "snr[0]": {
+    "snrName": "%s",
+    "snrType": "%i",
+    "snrVal": "%i"
+  },
+  "snr[1]": {
+    "snrName": "%s",
+    "snrType": "%i",
+    "snrVal": "%i"
+  },
+  "snr[2]": {
+    "snrName": "%s",
+    "snrType": "%i",
+    "snrVal": "%i"
+  },
+  "snr[3]": {
+    "snrName": "%s",
+    "snrType": "%i",
+    "snrVal": "%i"
+  }
+}
