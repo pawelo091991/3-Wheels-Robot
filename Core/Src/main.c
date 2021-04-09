@@ -35,7 +35,7 @@
 #define LED GPIO_PIN_5		//PA5
 #define BUZZER GPIO_PIN_6	//PB6
 #define BUTTON GPIO_PIN_10 	//PA10
-#define MXSPD	40
+#define MX SPD	40
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -108,20 +108,27 @@ int main(void)
   MX_ADC1_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
+
+  	  // initialize robot with default values
   	  robotDefaultValuesInit(&rob, &htim3, &htim2, &huart2, &huart1, &huart2, &hadc1);
+
+  	  // start interrupts for timer to send robot telemetry to computer
   	  HAL_TIM_Base_Start_IT(&htim4);
+
+  	  // perform start procedure
   	  robotStartProcedure(&rob);
+
+  	  // start main program
   	  robotWallBouncer(&rob);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+  // this loop should not be executed
   while (1)
   {
-	  robotReadSensors(&rob);
-	  robotWallBouncer(&rob);
-	  //robotTelemetry(&rob);
-	  //HAL_Delay(2000);
+
   }
     /* USER CODE END WHILE */
 
@@ -513,6 +520,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
  void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
  {
+	 // every 1 second send data to computer
 	 robotTelemetry(&rob);
  }
 /* USER CODE END 4 */

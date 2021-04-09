@@ -8,24 +8,28 @@
 
 void robotDefaultValuesInit(Robot* rob, TIM_HandleTypeDef* timEngLeft, TIM_HandleTypeDef* timEngRight, UART_HandleTypeDef* uartUSB, UART_HandleTypeDef* uartBlth, UART_HandleTypeDef* uartSelected, ADC_HandleTypeDef* adc)
 {
+	// assign timer, channel and GPIO pin for left engine PWM and direction
 	rob->engLeft.tim = timEngLeft;
-	rob->engLeft.timChl = TIM_CHANNEL_1;//3
+	rob->engLeft.timChl = TIM_CHANNEL_1;
 	rob->engLeft.dirPinPort = GPIOB;
 	rob->engLeft.dirPin = GPIO_PIN_5;
 	rob->engLeft.pwmVal = 0;
 
+	// assign timer, channel and GPIO pin for left engine PWM and direction
 	rob->engRight.tim = timEngRight;
 	rob->engRight.timChl = TIM_CHANNEL_3;//1
 	rob->engRight.dirPinPort = GPIOC;
 	rob->engRight.dirPin = GPIO_PIN_7;
 	rob->engRight.pwmVal = 0;
 
+	// assign HAL UART structures for communication via USB and Bluetooth
 	rob->uartUSB = uartUSB;
 	rob->uartBlth = uartBlth;
-	rob->blthPinPort = GPIOA;		//to trzeba przerzucic na i2c
-	rob->blthPin = GPIO_PIN_15;		//to trzeba przerzucic na i2c
+	rob->blthPinPort = GPIOA;
+	rob->blthPin = GPIO_PIN_15;
 	rob->uartSelected = uartSelected;
 
+	// assign name, type and pin for digital sensor
 	strcpy(rob->snr[0].snrName, "RgtCnct");
 	rob->snr[0].snrPinPort = DIGIAL_SNR;
 	rob->snr[0].snrPinPort = GPIOA;
@@ -38,6 +42,7 @@ void robotDefaultValuesInit(Robot* rob, TIM_HandleTypeDef* timEngLeft, TIM_Handl
 	rob->snr[1].snrPin = GPIO_PIN_1;
 	rob->snr[1].snrVal = 0;
 
+	// assign name, type and ADC data t0 analog sensors
 	strcpy(rob->snr[2].snrName, "RgtLight");
 	rob->snr[2].snrType = ANALOG_SNR;
 	rob->snr[2].snrPinPort = GPIOC;
@@ -67,11 +72,15 @@ void robotDefaultValuesInit(Robot* rob, TIM_HandleTypeDef* timEngLeft, TIM_Handl
 
 void robotSetEnginePwm(Robot* rob, int8_t pwmValLeft, int8_t pwmValRight)
 {
+	// check if input is proper
 	if(pwmValLeft >= -100 && pwmValLeft <= 100 && pwmValRight >= -100 && pwmValRight <= 100)
 	{
+		// asign input values into robot structure
 		rob->engLeft.pwmVal = pwmValLeft;
 		rob->engRight.pwmVal = pwmValRight;
 
+		// if speed is set for more than 0, set direction pin to foward movement,
+		// else set direction to backward movement
 		if(rob->engLeft.pwmVal >= 0)
 			HAL_GPIO_WritePin(rob->engLeft.dirPinPort, rob->engLeft.dirPin, FOWARD);
 		else
@@ -82,12 +91,14 @@ void robotSetEnginePwm(Robot* rob, int8_t pwmValLeft, int8_t pwmValRight)
 		else
 			HAL_GPIO_WritePin(rob->engRight.dirPinPort, rob->engRight.dirPin, BACKWARD);
 
+		// based on proportion calculate PWM value for timers
 		uint32_t pwmVal = abs((rob->engLeft.pwmVal * PWM_MAX) / 100);
 		__HAL_TIM_SET_COMPARE(rob->engLeft.tim, rob->engLeft.timChl, pwmVal);
 
-		pwmVal = abs((rob->engRight.pwmVal * PWM_MAX) / 100)
-				;
+		pwmVal = abs((rob->engRight.pwmVal * PWM_MAX) / 100);
 		__HAL_TIM_SET_COMPARE(rob->engRight.tim, rob->engRight.timChl, pwmVal);
+
+		// start the engines
 		HAL_TIM_PWM_Start(rob->engRight.tim, rob->engRight.timChl);
 		HAL_TIM_PWM_Start(rob->engLeft.tim, rob->engLeft.timChl);
 	}
@@ -132,9 +143,16 @@ void robotTelemetry(Robot *rob)
 
 void robotManualSteering(Robot* rob)
 {
+	// wait until RECEIVE NOT EMPTY buffer flag is TRUE
 	while(__HAL_UART_GET_FLAG(rob->uartSelected, UART_FLAG_RXNE) == RESET) {}
+
+	// declare variable to store command
 	uint8_t key;
+
+	// put data into variable
 	HAL_UART_Receive(rob->uartSelected, &key, 1, 100);
+
+	// check which direction to be selected (foward, backward, left right)
 	switch(key){
 	case 'w':
 		robotSetEnginePwm(rob, 100, 100);
@@ -155,14 +173,29 @@ void robotManualSteering(Robot* rob)
 
 void robotReadSensors(Robot* rob)
 {
+	// iterate over all defined sensors
 	for(uint8_t i = 0; i < NUMBER_SNR; i++){
-		if(rob->snr[i].snrType == DIGIAL_SNR)
-			rob->snr[i].snrVal = HAL_GPIO_ReadPin(rob->snr[i].snrPinPort, rob->snr[i].snrPin);
 
+		// check if sensor is digital
+		if(rob->snr[i].snrType == DIGIAL_SNR){
+
+			// digital sensor - read 1 or 0
+			rob->snr[i].snrVal = HAL_GPIO_ReadPin(rob->snr[i].snrPinPort, rob->snr[i].snrPin);
+		}
+
+		// else check if sensor is analog
 		else if(rob->snr[i].snrType == ANALOG_SNR){
+
+			// analog sensor - configure switch ADC for channel that sensor is using
 			HAL_ADC_ConfigChannel(rob->snr[i].snrAdc, &rob->snr[i].snrAdcChannel);
+
+			// start ADC
 			HAL_ADC_Start(rob->snr[i].snrAdc);
+
+			// wait until ADC complete conversion
 			HAL_ADC_PollForConversion(rob->snr[i].snrAdc, 1000);
+
+			//assign value to sensor structure
 			rob->snr[i].snrVal = HAL_ADC_GetValue(rob->snr[i].snrAdc);
 		}
 	}
@@ -278,38 +311,55 @@ void robotWallBouncer(Robot* rob)
 
 void robotLightFollower(Robot* rob)
 {
-	  robotReadSensors(rob);
-	  robotTelemetry(rob);
-	  if(rob->StartProcedureFinished == 0){
-		  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-		  HAL_Delay(1000);
-		  if(rob->snr[2].snrVal < 700 || rob->snr[3].snrVal < 700){
-			  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
-			  HAL_Delay(1000);
-			  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_6);
-			  rob->StartProcedureFinished = 1;
-		  }
-	  }
-	  else{
-		  int32_t diff = rob->snr[2].snrVal - rob->snr[3].snrVal;
-		  if(diff > 300) diff = 300;
-		  else if(diff < -300) diff = -300;
-		  int8_t pwmSpd = (diff *20)/300;
-		  if(pwmSpd > 20) pwmSpd = 20;
-		  else if(pwmSpd < -20) pwmSpd = -20;
+	// read data from sensors
+	robotReadSensors(rob);
 
-		  robotSetEnginePwm(rob, 50+pwmSpd, 50-pwmSpd);
-	  }
+	// check the difference from left and right light sensor
+	int32_t diff = rob->snr[2].snrVal - rob->snr[3].snrVal;
+
+	// set limit for difference
+	if(diff > 300) {
+		diff = 300;
+	}
+	else if(diff < -300){
+		diff = -300;
+	}
+
+	// calculate the difference between left and right wheels speed
+	int8_t pwmSpd = (diff *20)/300;
+
+	// set limit for speed
+	if(pwmSpd > 20){
+		pwmSpd = 20;
+	}
+	else if(pwmSpd < -20){
+		pwmSpd = -20;
+	}
+
+	//apply PWM for both enginees
+	robotSetEnginePwm(rob, 50+pwmSpd, 50-pwmSpd);
 }
 
 void robotLineFollowerV1(Robot* rob)
 {
+	// read data from sensors
 	robotReadSensors(rob);
-	robotTelemetry(rob);
+
+	// check the difference from left and right light sensor
 	int32_t diff = rob->snr[2].snrVal - rob->snr[3].snrVal;
-	if(diff > 100) diff = 100;
-	else if(diff < -100) diff = -100;
+
+	// set limit for difference
+	if(diff > 100){
+		diff = 100;
+	}
+	else if(diff < -100){
+		diff = -100;
+	}
+
+	// calculate the difference between left and right wheels speed
 	diff = (diff * 30)/100;
+
+	// apply PWM for both enginees, if diff > 0 turn right, if diff < 0 turn left
 	if(diff > 0) {
 	  diff = abs(diff);
 	  robotSetEnginePwm(rob, 40, 40-diff);
@@ -322,12 +372,14 @@ void robotLineFollowerV1(Robot* rob)
 
 void robotSwitchBuzzer(Robot* rob, uint8_t state)
 {
+	// check if input is correct and change state of buzzer
 	if(state == 0 || state == 1)
 		HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, state);
 }
 
 void robotSwitchLED(Robot* rob, uint8_t state)
 {
+	// check if input is correct and change state of buzzer
 	if(state == 0 || state == 1)
 		HAL_GPIO_WritePin(LED_PORT, LED_PIN, state);
 }
